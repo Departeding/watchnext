@@ -22,6 +22,8 @@
         padding: 12px 20px; border-radius: 8px; color: white; font-weight: 500;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); z-index: 1000;
         display: none; opacity: 0; transition: opacity 0.3s ease-in-out;
+        max-width: 90%;
+        text-align: center;
       }
       #message-box.show { display: block; opacity: 1; }
       #message-box.info { background-color: #3b82f6; }
@@ -76,10 +78,10 @@
       .page-info { font-size: 0.875rem; color: #d1d5db; }
 
       /* Details Page Styles */
-      .details-backdrop { height: 300px; background-size: cover; background-position: center center; position: relative; }
+      .details-backdrop { height: 200px; md:height: 300px; background-size: cover; background-position: center center; position: relative; }
       .details-backdrop::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%); }
-      .details-poster { width: 150px; height: auto; aspect-ratio: 2 / 3; border-radius: 0.375rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); margin-top: -75px; position: relative; z-index: 1; }
-      .details-cast-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.75rem; }
+      .details-poster { width: 120px; md:width: 150px; height: auto; aspect-ratio: 2 / 3; border-radius: 0.375rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); margin-top: -60px; md:margin-top: -75px; position: relative; z-index: 1; }
+      .details-cast-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); md:grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.75rem; }
       .cast-card { font-size: 0.75rem; text-align: center; }
       .cast-photo { width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 0.25rem; background-color: #e5e7eb; margin-bottom: 0.25rem; }
       .cast-name { font-weight: 500; color: #374151; }
@@ -95,21 +97,8 @@
       .top-nav button#nav-home.active-nav-link { background-color: #6b7280; }
 
       /* Increased Clickable Area for Details Back Button */
-      .details-back-button {
-        position: relative; /* Needed for absolute positioning of pseudo-element */
-        cursor: pointer;
-        /* Visual styles are applied via Tailwind */
-      }
-      .details-back-button::after {
-        content: '';
-        position: absolute;
-        /* Increase hit area by 10px outwards */
-        top: -10px;
-        left: -10px;
-        right: -10px;
-        bottom: -10px;
-        background: transparent; /* Make it invisible */
-      }
+      .details-back-button { position: relative; cursor: pointer; }
+      .details-back-button::after { content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; background: transparent; }
 
       /* Helper */
       .hidden { display: none; }
@@ -125,32 +114,38 @@
         </div>
     </nav>
 
-    <div id="landing-page" class="flex flex-col items-center justify-center min-h-[calc(100vh-60px)] text-white p-8">
-        <h1 class="text-4xl md:text-5xl font-bold mb-8 text-center">Your Next Watch</h1>
-        <p class="text-lg text-gray-300 mb-12 text-center">What are you in the mood for today?</p>
+    <div id="landing-page" class="flex flex-col items-center justify-center min-h-[calc(100vh-60px)] text-white p-4 md:p-8">
+        <h1 class="text-3xl md:text-5xl font-bold mb-6 md:mb-8 text-center">WatchNext</h1>
+        <p class="text-base md:text-lg text-gray-300 mb-10 md:mb-12 text-center">What are you in the mood for today</p>
 
-        <div class="flex flex-col sm:flex-row gap-6 mb-12 w-full max-w-xl justify-center">
-            <div id="landing-movie-container" class="relative w-full sm:w-auto cursor-pointer transition-transform duration-200 hover:scale-105">
+        <div class="flex flex-col sm:flex-row gap-6 mb-12 w-full max-w-md sm:max-w-2xl justify-center"> 
+           
+            <div id="landing-movie-container" class="relative w-full sm:w-1/2 cursor-pointer transition-transform duration-200 hover:scale-105 group">
                 <img src="cinema-4153289.jpg"
                      alt="Illustration of a movie projector and film reel"
-                     class="w-full sm:w-48 lg:w-60 h-64 lg:h-80 object-cover rounded-lg shadow-md brightness-75 hover:brightness-100 transition-all"
-                     onerror="this.onerror=null; this.src='https://placehold.co/256x384/cccccc/666666?text=Movies+Error';">
-                <div class="absolute bottom-4 left-4 right-4 text-center text-white text-xl font-semibold pointer-events-none">Movies</div>
+                     class="w-full h-72 sm:h-80 md:h-96 object-cover rounded-lg shadow-md brightness-75 group-hover:brightness-90 transition-all"
+                     onerror="this.onerror=null; this.src='https://placehold.co/300x450/cccccc/666666?text=Movies+Error';">
+                <div class="absolute inset-0 flex items-center justify-center p-4">
+                     <span class="text-white text-xl md:text-2xl font-semibold bg-black bg-opacity-50 px-4 py-2 rounded-md">Movies</span>
+                </div>
             </div>
 
-            <div id="landing-tv-container" class="relative w-full sm:w-auto cursor-pointer transition-transform duration-200 hover:scale-105">
-                <img src="https://placehold.co/256x384/14b8a6/ffffff?text=TV+Shows"
+            
+            <div id="landing-tv-container" class="relative w-full sm:w-1/2 cursor-pointer transition-transform duration-200 hover:scale-105 group">
+                <img src="https://placehold.co/300x450/14b8a6/ffffff?text=TV+Shows"
                      alt="TV show poster collage placeholder"
-                     class="w-full sm:w-48 lg:w-60 h-64 lg:h-80 object-cover rounded-lg shadow-md brightness-75 hover:brightness-100 transition-all"
-                     onerror="this.onerror=null; this.src='https://placehold.co/256x384/cccccc/666666?text=TV+Error';">
-                 <div class="absolute bottom-4 left-4 right-4 text-center text-white text-xl font-semibold pointer-events-none">TV Shows</div>
+                     class="w-full h-72 sm:h-80 md:h-96 object-cover rounded-lg shadow-md brightness-75 group-hover:brightness-90 transition-all"
+                     onerror="this.onerror=null; this.src='https://placehold.co/300x450/cccccc/666666?text=TV+Error';">
+                 <div class="absolute inset-0 flex items-center justify-center p-4">
+                     <span class="text-white text-xl md:text-2xl font-semibold bg-black bg-opacity-50 px-4 py-2 rounded-md">TV Shows</span>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="movie-app" class="hidden">
-        <div class="flex flex-col md:flex-row gap-6 max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
-            <div id="movie-filters-container" class="md:w-1/3 lg:w-1/4 order-1 md:order-1 bg-gray-100 p-4 rounded-lg shadow-md max-h-[calc(100vh-150px)] overflow-y-auto scrollable-area">
+        <div class="flex flex-col md:flex-row gap-4 md:gap-6 max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+            <div id="movie-filters-container" class="w-full md:w-1/3 lg:w-1/4 order-1 md:order-1 bg-gray-100 p-4 rounded-lg shadow-md md:max-h-[calc(100vh-150px)] overflow-y-auto scrollable-area">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4 text-center">Movie Filters</h2>
                 <form id="movie-recommendation-form" class="space-y-4">
                      <div>
@@ -190,13 +185,13 @@
                 </form>
             </div>
 
-            <div class="flex-grow md:w-2/3 lg:w-3/4 order-2 md:order-2">
+            <div class="w-full md:w-2/3 lg:w-3/4 order-2 md:order-2">
                  <div id="movie-results-view">
-                     <div id="movie-sort-controls" class="flex justify-between items-center mb-4">
+                     <div id="movie-sort-controls" class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                          <h2 class="text-xl sm:text-2xl font-semibold text-gray-100">Movie Recommendations</h2>
-                         <div class="flex items-center">
-                             <label for="movie-sort-options" class="text-sm font-medium text-gray-300 mr-2">Sort by:</label>
-                             <select id="movie-sort-options" name="sort-options" class="p-2 border border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-gray-700 text-gray-100">
+                         <div class="flex items-center w-full sm:w-auto">
+                             <label for="movie-sort-options" class="text-sm font-medium text-gray-300 mr-2 shrink-0">Sort by:</label>
+                             <select id="movie-sort-options" name="sort-options" class="flex-grow p-2 border border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-gray-700 text-gray-100">
                                  <option value="popularity.desc">Popularity</option>
                                  <option value="vote_average.desc">Rating (High-Low)</option>
                                  <option value="vote_average.asc">Rating (Low-High)</option>
@@ -206,8 +201,8 @@
                              </select>
                          </div>
                      </div>
-                     <div id="movie-results-container" class="min-h-[400px] max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollable-area">
-                         <div id="movie-results" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                     <div id="movie-results-container" class="min-h-[400px] md:max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollable-area">
+                         <div id="movie-results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                              <p id="movie-results-placeholder" class="text-center text-gray-400 p-4 col-span-full">Select filters and click "Find Movies".</p>
                          </div>
                      </div>
@@ -225,7 +220,7 @@
 
     <div id="tv-app" class="hidden">
         <div class="flex flex-col md:flex-row gap-6 max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
-            <div id="tv-filters-container" class="md:w-1/3 lg:w-1/4 order-1 md:order-1 bg-gray-100 p-4 rounded-lg shadow-md max-h-[calc(100vh-100px)] overflow-y-auto scrollable-area">
+            <div id="tv-filters-container" class="w-full md:w-1/3 lg:w-1/4 order-1 md:order-1 bg-gray-100 p-4 rounded-lg shadow-md md:max-h-[calc(100vh-100px)] overflow-y-auto scrollable-area">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4 text-center">TV Show Filters</h2>
                 <form id="tv-recommendation-form" class="space-y-4">
                      <div>
@@ -265,13 +260,13 @@
                 </form>
             </div>
 
-            <div class="flex-grow md:w-2/3 lg:w-3/4 order-2 md:order-2">
+            <div class="w-full md:w-2/3 lg:w-3/4 order-2 md:order-2">
                  <div id="tv-results-view">
-                     <div id="tv-sort-controls" class="flex justify-between items-center mb-4">
+                     <div id="tv-sort-controls" class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                          <h2 class="text-xl sm:text-2xl font-semibold text-gray-100">TV Show Recommendations</h2>
-                         <div class="flex items-center">
-                             <label for="tv-sort-options" class="text-sm font-medium text-gray-300 mr-2">Sort by:</label>
-                             <select id="tv-sort-options" name="sort-options" class="p-2 border border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm bg-gray-700 text-gray-100">
+                         <div class="flex items-center w-full sm:w-auto">
+                             <label for="tv-sort-options" class="text-sm font-medium text-gray-300 mr-2 shrink-0">Sort by:</label>
+                             <select id="tv-sort-options" name="sort-options" class="flex-grow p-2 border border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm bg-gray-700 text-gray-100">
                                  <option value="popularity.desc">Popularity Desc</option>
                                  <option value="popularity.asc">Popularity Asc</option>
                                  <option value="vote_average.desc">Rating Desc</option>
@@ -281,8 +276,8 @@
                              </select>
                          </div>
                      </div>
-                     <div id="tv-results-container" class="min-h-[400px] max-h-[calc(100vh-200px)] overflow-y-auto pr-2 scrollable-area">
-                         <div id="tv-results" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                     <div id="tv-results-container" class="min-h-[400px] md:max-h-[calc(100vh-200px)] overflow-y-auto pr-2 scrollable-area">
+                         <div id="tv-results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                              <p id="tv-results-placeholder" class="text-center text-gray-400 p-4 col-span-full">Select filters and click "Find TV Shows".</p>
                          </div>
                      </div>
@@ -385,15 +380,15 @@
 
         // --- Utility Functions ---
         function populateSelect(selectElement, map, defaultValue = null) { if (!selectElement) return; const firstOption = selectElement.options[0]; selectElement.innerHTML = ''; if (firstOption && firstOption.value === "") { selectElement.appendChild(firstOption); } const sortedEntries = Object.entries(map).sort((a, b) => a[0].localeCompare(b[0])); sortedEntries.forEach(([name, value]) => { const option = document.createElement('option'); option.value = value; option.textContent = name; if (value === defaultValue) { option.selected = true; } selectElement.appendChild(option); }); }
-        function showMessage(message, type = 'error', duration = 4000) { messageBox.textContent = message; messageBox.className = ''; messageBox.classList.add('show', type); if (messageTimeout) clearTimeout(messageTimeout); messageTimeout = setTimeout(() => { messageBox.classList.remove('show'); }, duration); }
+        function showMessage(message, type = 'error', duration = 4000) { messageBox.textContent = message; messageBox.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 max-w-[90%] text-center'; messageBox.classList.add('show', type); if (messageTimeout) clearTimeout(messageTimeout); messageTimeout = setTimeout(() => { messageBox.classList.remove('show'); }, duration); }
         async function fetchWatchProviders(items, type = 'movie') { const idKey = 'id'; const endpoint = type; const providerPromises = items.map(item => { if (!item || !item[idKey]) { console.warn("Item missing ID for provider fetch:", item); return Promise.resolve(null); } const providerUrl = `${tmdbBaseUrl}/${endpoint}/${item[idKey]}/watch/providers?api_key=${apiKey}`; return fetch(providerUrl).then(response => response.ok ? response.json() : null) .catch(error => { console.error(`Error fetching providers for ${type} ${item[idKey]}:`, error); return null; }); }); const results = await Promise.allSettled(providerPromises); return items.map((item, index) => { if (item) { item.watchProviders = (results[index].status === 'fulfilled' && results[index].value) ? results[index].value.results : null; } return item; }); }
 
         // --- Movie App Functions ---
         function movieDisplayResults(movies, watchCountryCode) { movieResultsDiv.innerHTML = ''; const placeholder = document.getElementById('movie-results-placeholder'); if (placeholder) placeholder.style.display = 'none'; if (!movies || movies.length === 0) { movieResultsDiv.innerHTML = '<p class="text-center text-gray-500 p-4 col-span-full">No movies found matching your criteria.</p>'; return; } movies.forEach(movie => { if (!movie) return; const gridItem = document.createElement('div'); gridItem.className = 'movie-grid-item grid-item'; gridItem.dataset.itemId = movie.id; gridItem.dataset.itemType = 'movie'; const posterImg = document.createElement('img'); posterImg.className = 'poster-grid'; posterImg.src = movie.poster_path ? `${imageBaseUrl}${movie.poster_path}` : 'https://placehold.co/342x513/e5e7eb/4b5563?text=N/A'; posterImg.alt = `Poster for ${movie.title || 'movie'}`; posterImg.loading = 'lazy'; posterImg.onerror = function() { this.onerror=null; this.src='https://placehold.co/342x513/e5e7eb/4b5563?text=Error'; }; gridItem.appendChild(posterImg); const infoDiv = document.createElement('div'); infoDiv.className = 'item-info'; const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'; const voteCount = movie.vote_count !== undefined ? movie.vote_count : 0; const year = movie.release_date ? movie.release_date.substring(0, 4) : 'N/A'; const lang = movie.original_language ? movie.original_language.toUpperCase() : 'N/A'; infoDiv.innerHTML = `<p><strong>Rating:</strong> ${rating}/10 (${voteCount.toLocaleString()} votes)</p> <p><strong>Year:</strong> ${year} | <strong>Lang:</strong> ${lang}</p>`; gridItem.appendChild(infoDiv); const tooltip = document.createElement('div'); tooltip.className = 'provider-tooltip'; const providerListDiv = document.createElement('div'); const providers = movie.watchProviders?.[watchCountryCode]?.flatrate; if (providers && providers.length > 0) { providers.slice(0, 3).forEach(p => { const span = document.createElement('span'); span.textContent = p.provider_name; providerListDiv.appendChild(span); }); if (providers.length > 3) providerListDiv.innerHTML += ' ...'; } else if (movie.watchProviders === null) { providerListDiv.innerHTML = `<span class="text-gray-400 italic">Providers N/A</span>`; } else { providerListDiv.innerHTML = `<span class="text-gray-400 italic">No ${watchCountryCode} stream</span>`; } tooltip.appendChild(providerListDiv); gridItem.appendChild(tooltip); gridItem.addEventListener('click', () => { showMovieDetails(movie.id); }); movieResultsDiv.appendChild(gridItem); }); }
         function movieUpdatePaginationControls() { if (movieTotalResults > 0) { moviePageInfo.textContent = `Page ${movieCurrentPage} of ${movieTotalPages} (${movieTotalResults} results)`; moviePrevButton.disabled = movieCurrentPage <= 1; movieNextButton.disabled = movieCurrentPage >= movieTotalPages; moviePaginationControls.style.display = 'flex'; } else { moviePaginationControls.style.display = 'none'; } }
-        function movieRenderDetails(movieData) { movieDetailsPage.innerHTML = ''; const backdropPath = movieData.backdrop_path ? `${backdropBaseUrl}${movieData.backdrop_path}` : ''; const posterPath = movieData.poster_path ? `${imageBaseUrl}${movieData.poster_path}` : 'https://placehold.co/150x225/e5e7eb/4b5563?text=N/A'; const title = movieData.title || 'Title Not Available'; const tagline = movieData.tagline || ''; const overview = movieData.overview || 'No overview available.'; const releaseYear = movieData.release_date ? movieData.release_date.substring(0, 4) : 'N/A'; const runtime = movieData.runtime ? `${Math.floor(movieData.runtime / 60)}h ${movieData.runtime % 60}m` : 'N/A'; const rating = movieData.vote_average ? movieData.vote_average.toFixed(1) : 'N/A'; const voteCount = movieData.vote_count !== undefined ? movieData.vote_count : 0; const genres = movieData.genres?.map(g => g.name).join(', ') || 'N/A'; const cast = movieData.credits?.cast?.slice(0, 10) || []; const detailsHTML = `<div class="details-backdrop" style="background-image: ${backdropPath ? `url(${backdropPath})` : 'none'}; background-color: #e5e7eb;"></div> <div class="p-4 md:p-6"> <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end"> <button id="movie-back-to-results" class="details-back-button inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 gap-1"> <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/arrow-left.svg" alt="Back" class="w-4 h-4 inline-block" style="filter: invert(1);"/> Back </button> </div> <div class="flex flex-col sm:flex-row gap-4 md:gap-6 items-start mt-[-75px]"> <img src="${posterPath}" alt="Poster for ${title}" class="details-poster flex-shrink-0 mx-auto sm:mx-0" onerror="this.onerror=null; this.src='https://placehold.co/150x225/e5e7eb/4b5563?text=Error';"> <div class="flex-grow pt-4 sm:pt-0 text-gray-800"> <h1 class="text-2xl md:text-3xl font-bold mb-1">${title} <span class="font-normal text-xl md:text-2xl text-gray-500">(${releaseYear})</span></h1> ${tagline ? `<p class="text-sm text-gray-500 italic mb-3">${tagline}</p>` : ''} <div class="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm mb-3 text-gray-600"> <span>${genres}</span> ${movieData.runtime ? `<span>• ${runtime}</span>` : ''} </div> <div class="flex items-center gap-2 mb-4"> <span class="text-lg font-semibold text-yellow-500">★ ${rating}</span> <span class="text-xs text-gray-500">(${voteCount.toLocaleString()} votes)</span> </div> <h3 class="text-lg font-semibold mb-1 text-gray-800">Overview</h3> <p class="text-sm text-gray-700 mb-4">${overview}</p> </div> </div> ${cast.length > 0 ? `<div class="mt-6"><h3 class="text-lg font-semibold mb-3 text-gray-800">Top Billed Cast</h3><div class="details-cast-grid">${cast.map(member => `<div class="cast-card"><img src="${member.profile_path ? `${castProfileBaseUrl}${member.profile_path}` : 'https://placehold.co/185x278/e5e7eb/4b5563?text=N/A'}" alt="${member.name}" class="cast-photo" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/185x278/e5e7eb/4b5563?text=Error';"><p class="cast-name">${member.name || 'N/A'}</p><p class="cast-char">${member.character || 'N/A'}</p></div>`).join('')}</div></div>` : ''} </div>`; movieDetailsPage.innerHTML = detailsHTML; const backButton = movieDetailsPage.querySelector('#movie-back-to-results'); if (backButton) { backButton.addEventListener('click', hideMovieDetails); console.log("Movie Back Button Listener Attached"); } else { console.error("Movie back button not found");} }
+        function movieRenderDetails(movieData) { movieDetailsPage.innerHTML = ''; const backdropPath = movieData.backdrop_path ? `${backdropBaseUrl}${movieData.backdrop_path}` : ''; const posterPath = movieData.poster_path ? `${imageBaseUrl}${movieData.poster_path}` : 'https://placehold.co/150x225/e5e7eb/4b5563?text=N/A'; const title = movieData.title || 'Title Not Available'; const tagline = movieData.tagline || ''; const overview = movieData.overview || 'No overview available.'; const releaseYear = movieData.release_date ? movieData.release_date.substring(0, 4) : 'N/A'; const runtime = movieData.runtime ? `${Math.floor(movieData.runtime / 60)}h ${movieData.runtime % 60}m` : 'N/A'; const rating = movieData.vote_average ? movieData.vote_average.toFixed(1) : 'N/A'; const voteCount = movieData.vote_count !== undefined ? movieData.vote_count : 0; const genres = movieData.genres?.map(g => g.name).join(', ') || 'N/A'; const cast = movieData.credits?.cast?.slice(0, 10) || []; const detailsHTML = `<div class="details-backdrop" style="background-image: ${backdropPath ? `url(${backdropPath})` : 'none'}; background-color: #e5e7eb;"></div> <div class="p-4 md:p-6"> <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end"> <button id="movie-back-to-results" class="details-back-button inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 gap-1"> <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/arrow-left.svg" alt="Back" class="w-4 h-4 inline-block" style="filter: invert(1);"/> Back </button> </div> <div class="flex flex-col sm:flex-row gap-4 md:gap-6 items-start mt-[-75px]"> <img src="${posterPath}" alt="Poster for ${title}" class="details-poster flex-shrink-0 mx-auto sm:mx-0" onerror="this.onerror=null; this.src='https://placehold.co/150x225/e5e7eb/4b5563?text=Error';"> <div class="flex-grow pt-4 sm:pt-0 text-gray-800"> <h1 class="text-2xl md:text-3xl font-bold mb-1">${title} <span class="font-normal text-xl md:text-2xl text-gray-500">(${releaseYear})</span></h1> ${tagline ? `<p class="text-sm text-gray-500 italic mb-3">${tagline}</p>` : ''} <div class="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm mb-3 text-gray-600"> <span>${genres}</span> ${movieData.runtime ? `<span>• ${runtime}</span>` : ''} </div> <div class="flex items-center gap-2 mb-4"> <span class="text-lg font-semibold text-yellow-500">★ ${rating}</span> <span class="text-xs text-gray-500">(${voteCount.toLocaleString()} votes)</span> </div> <h3 class="text-lg font-semibold mb-1 text-gray-800">Overview</h3> <p class="text-sm text-gray-700 mb-4">${overview}</p> </div> </div> ${cast.length > 0 ? `<div class="mt-6"><h3 class="text-lg font-semibold mb-3 text-gray-800">Top Billed Cast</h3><div class="details-cast-grid">${cast.map(member => `<div class="cast-card"><img src="${member.profile_path ? `${castProfileBaseUrl}${member.profile_path}` : 'https://placehold.co/185x278/e5e7eb/4b5563?text=N/A'}" alt="${member.name}" class="cast-photo" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/185x278/e5e7eb/4b5563?text=Error';"><p class="cast-name">${member.name || 'N/A'}</p><p class="cast-char">${member.character || 'N/A'}</p></div>`).join('')}</div></div>` : ''} </div>`; movieDetailsPage.innerHTML = detailsHTML; const backButton = movieDetailsPage.querySelector('#movie-back-to-results'); if (backButton) { backButton.addEventListener('click', hideMovieDetails); } }
         async function showMovieDetails(movieId) { movieResultsView.classList.add('hidden'); movieDetailsPage.classList.remove('hidden'); movieDetailsPage.innerHTML = '<p class="text-center p-8 text-gray-500">Loading movie details...</p>'; const detailsUrl = `${tmdbBaseUrl}/movie/${movieId}?api_key=${apiKey}&append_to_response=credits`; try { const response = await fetch(detailsUrl); if (!response.ok) { let errorMsg = `Error fetching details: ${response.status}`; try { const data=await response.json(); errorMsg += `: ${data.status_message}`;} catch(e){} throw new Error(errorMsg); } const movieData = await response.json(); movieRenderDetails(movieData); } catch (error) { console.error("Fetch Movie Details Error:", error); showMessage(`Failed to load movie details. ${error.message}`, 'error'); movieDetailsPage.innerHTML = `<p class="text-center p-8 text-red-600">Could not load details.</p><div class="mt-4 p-4 text-center"><button id="movie-back-to-results-error" class="details-back-button inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 gap-1"><img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/arrow-left.svg" alt="Back" class="w-4 h-4 inline-block" style="filter: invert(1);"/> Back</button></div>`; const backButtonError = movieDetailsPage.querySelector('#movie-back-to-results-error'); if(backButtonError) backButtonError.addEventListener('click', hideMovieDetails); } }
-        function hideMovieDetails() { console.log("hideMovieDetails called"); movieDetailsPage.classList.add('hidden'); movieDetailsPage.innerHTML = ''; movieResultsView.classList.remove('hidden'); }
+        function hideMovieDetails() { movieDetailsPage.classList.add('hidden'); movieDetailsPage.innerHTML = ''; movieResultsView.classList.remove('hidden'); }
         async function moviePerformSearchAndDisplay(page = 1) { hideMovieDetails(); movieFindButton.disabled = true; if(moviePrevButton) moviePrevButton.disabled = true; if(movieNextButton) movieNextButton.disabled = true; moviePaginationControls.style.display = 'none'; movieCurrentPage = page; movieResultsDiv.innerHTML = ''; if (movieResultsPlaceholder) movieResultsPlaceholder.style.display = 'block'; movieResultsPlaceholder.textContent = `Loading page ${movieCurrentPage}...`; const discoverUrl = new URL(`${tmdbBaseUrl}/discover/movie`); discoverUrl.searchParams.append('api_key', apiKey); discoverUrl.searchParams.append('page', movieCurrentPage); discoverUrl.searchParams.append('include_adult', 'false'); discoverUrl.searchParams.append('include_video', 'false'); discoverUrl.searchParams.append('language', 'en-US'); discoverUrl.searchParams.append('sort_by', movieCurrentSort); discoverUrl.searchParams.append('vote_count.gte', 100); if (movieCurrentFilters.genreId) discoverUrl.searchParams.append('with_genres', movieCurrentFilters.genreId); if (movieCurrentFilters.rating > 0) discoverUrl.searchParams.append('vote_average.gte', movieCurrentFilters.rating.toFixed(1)); if (movieCurrentFilters.releaseGte) discoverUrl.searchParams.append('primary_release_date.gte', movieCurrentFilters.releaseGte); if (movieCurrentFilters.releaseLte) discoverUrl.searchParams.append('primary_release_date.lte', movieCurrentFilters.releaseLte); if (movieCurrentFilters.langCode) discoverUrl.searchParams.append('with_original_language', movieCurrentFilters.langCode); if (movieCurrentFilters.originCountry) discoverUrl.searchParams.append('with_origin_country', movieCurrentFilters.originCountry); console.log('Fetching Movie URL:', discoverUrl.toString()); try { const response = await fetch(discoverUrl); if (!response.ok) { let errorMsg = `Error fetching movies: ${response.status}`; try { const data=await response.json(); errorMsg += `: ${data.status_message}`;} catch(e){} throw new Error(errorMsg); } const data = await response.json(); let fetchedMovies = data.results; movieTotalPages = data.total_pages; movieTotalResults = data.total_results; if (fetchedMovies.length === 0) { if (movieCurrentPage === 1) { movieDisplayResults([], movieCurrentWatchCountry); } else { showMessage(`No results found on page ${movieCurrentPage}.`, 'info'); movieDisplayResults([], movieCurrentWatchCountry); } movieUpdatePaginationControls(); return; } if (movieResultsPlaceholder) movieResultsPlaceholder.textContent = 'Fetching watch provider information...'; const moviesWithProviders = await fetchWatchProviders(fetchedMovies, 'movie'); movieCurrentMovieData = moviesWithProviders; movieDisplayResults(movieCurrentMovieData, movieCurrentWatchCountry); movieUpdatePaginationControls(); } catch (error) { console.error("API Fetch Error (Movie):", error); showMessage(`Failed to process request. ${error.message}`, 'error'); movieResultsDiv.innerHTML = `<p class="text-center text-red-600 p-4 col-span-full">Error loading recommendations.</p>`; if (movieResultsPlaceholder) movieResultsPlaceholder.style.display = 'none'; moviePaginationControls.style.display = 'none'; } finally { movieFindButton.disabled = false; movieFindButton.innerHTML = `<img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/search.svg" alt="Search" class="w-5 h-5 inline-block -ml-1" style="filter: invert(1);"/> Find Movies`; movieUpdatePaginationControls(); } }
 
         // --- TV App Functions ---
