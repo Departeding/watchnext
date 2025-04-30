@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css" rel="stylesheet">
     <style>
-      body { font-family: 'Inter', sans-serif; /* background-color: #252526; <- Removed, handled by body class */ }
+      body { font-family: 'Inter', sans-serif; background-color: #252526; }
 
       .scrollable-area::-webkit-scrollbar { width: 8px; height: 8px; }
       .scrollable-area::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
@@ -22,8 +22,6 @@
         padding: 12px 20px; border-radius: 8px; color: white; font-weight: 500;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); z-index: 1000;
         display: none; opacity: 0; transition: opacity 0.3s ease-in-out;
-        max-width: 90%;
-        text-align: center;
       }
       #message-box.show { display: block; opacity: 1; }
       #message-box.info { background-color: #3b82f6; }
@@ -50,4 +48,402 @@
         position: absolute; bottom: 10px; left: 10px; right: 10px; background-color: rgba(0, 0, 0, 0.8);
         color: white; padding: 0.5rem; border-radius: 0.375rem; font-size: 0.7rem; line-height: 1.3;
         opacity: 0; visibility: hidden; transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
-        z-index: 10; max-height: 60px; overf
+        z-index: 10; max-height: 60px; overflow: hidden; pointer-events: none;
+      }
+      .grid-item:hover .provider-tooltip { opacity: 1; visibility: visible; }
+       .provider-tooltip span { display: inline-block; margin-right: 4px; margin-bottom: 2px; padding: 1px 4px; background-color: rgba(255, 255, 255, 0.2); border-radius: 0.25rem; }
+
+      .noUi-target { border: 1px solid #d1d5db; box-shadow: none; background: #e5e7eb; border-radius: 9999px; height: 8px; }
+      .noUi-connect { background: #4f46e5; }
+      .year-slider .noUi-handle {
+           border: 1px solid #9ca3af; border-radius: 50%; background: #ffffff;
+           box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+           cursor: grab; width: 20px; height: 20px; right: -10px; top: -6px;
+       }
+        .year-slider .noUi-handle:focus { outline: none; }
+        .year-slider .noUi-handle:active { cursor: grabbing; }
+        .year-slider .noUi-handle::before, .year-slider .noUi-handle::after { display: none; }
+        .slider-values { display: flex; justify-content: space-between; margin-top: 4px; font-size: 0.75rem; color: #6b7280; padding: 0 2px; }
+        .noUi-tooltip { display: block; position: absolute; background: #374151; color: white; font-size: 0.75rem; font-weight: 500; padding: 2px 6px; border-radius: 0.25rem; white-space: nowrap; transform: translate(-50%, calc(100% + 5px)); bottom: -8px; left: 50%; border: none; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+
+      .pagination-controls { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; margin-top: 1rem; border-top: 1px solid #4b5563; }
+      .pagination-controls button { color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500; transition: background-color 0.15s ease-in-out; border: none; }
+      .pagination-controls button.btn-movie { background-color: #4f46e5; }
+      .pagination-controls button.btn-movie:hover:not(:disabled) { background-color: #4338ca; }
+      .pagination-controls button.btn-tv { background-color: #0d9488; }
+      .pagination-controls button.btn-tv:hover:not(:disabled) { background-color: #0f766e; }
+      .pagination-controls button:disabled { opacity: 0.5; cursor: not-allowed; }
+      .page-info { font-size: 0.875rem; color: #d1d5db; }
+
+      /* Details Page Styles */
+      .details-backdrop { height: 300px; background-size: cover; background-position: center center; position: relative; }
+      .details-backdrop::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%); }
+      .details-poster { width: 150px; height: auto; aspect-ratio: 2 / 3; border-radius: 0.375rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); margin-top: -75px; position: relative; z-index: 1; }
+      .details-cast-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.75rem; }
+      .cast-card { font-size: 0.75rem; text-align: center; }
+      .cast-photo { width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 0.25rem; background-color: #e5e7eb; margin-bottom: 0.25rem; }
+      .cast-name { font-weight: 500; color: #374151; }
+      .cast-char { color: #6b7280; }
+
+      /* Top Navigation Bar Styles */
+      .top-nav { background-color: #1f2937; padding: 0.75rem 1rem; box-shadow: 0 2px 4px -1px rgba(0,0,0,0.25); }
+      .top-nav button { color: #d1d5db; font-weight: 500; padding: 0.5rem 1rem; border-radius: 0.375rem; transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out; border: none; background-color: transparent; }
+      .top-nav button:hover { background-color: #4b5563; color: #ffffff; }
+      .top-nav button.active-nav-link { color: #ffffff; }
+      .top-nav button#nav-movies.active-nav-link { background-color: #4f46e5; }
+      .top-nav button#nav-tv.active-nav-link { background-color: #0d9488; }
+      .top-nav button#nav-home.active-nav-link { background-color: #6b7280; }
+
+      /* Increased Clickable Area for Details Back Button */
+      .details-back-button {
+        position: relative; /* Needed for absolute positioning of pseudo-element */
+        cursor: pointer;
+        /* Visual styles are applied via Tailwind */
+      }
+      .details-back-button::after {
+        content: '';
+        position: absolute;
+        /* Increase hit area by 10px outwards */
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        background: transparent; /* Make it invisible */
+      }
+
+      /* Helper */
+      .hidden { display: none; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-[#474747] via-[#4d4d4d] to-[#141414]">
+
+    <nav class="top-nav w-full">
+        <div class="max-w-7xl mx-auto flex justify-start space-x-4 md:space-x-8">
+             <button id="nav-home">Home</button>
+             <button id="nav-movies">Movies</button>
+             <button id="nav-tv">TV Shows</button>
+        </div>
+    </nav>
+
+    <div id="landing-page" class="flex flex-col items-center justify-center min-h-[calc(100vh-60px)] text-white p-8">
+        <h1 class="text-4xl md:text-5xl font-bold mb-8 text-center">Your Next Watch</h1>
+        <p class="text-lg text-gray-300 mb-12 text-center">What are you in the mood for today?</p>
+
+        <div class="flex flex-col sm:flex-row gap-6 mb-12 w-full max-w-xl justify-center">
+            <div id="landing-movie-container" class="relative w-full sm:w-auto cursor-pointer transition-transform duration-200 hover:scale-105">
+                <img src="cinema-4153289.jpg"
+                     alt="Illustration of a movie projector and film reel"
+                     class="w-full sm:w-48 lg:w-60 h-64 lg:h-80 object-cover rounded-lg shadow-md brightness-75 hover:brightness-100 transition-all"
+                     onerror="this.onerror=null; this.src='https://placehold.co/256x384/cccccc/666666?text=Movies+Error';">
+                <div class="absolute bottom-4 left-4 right-4 text-center text-white text-xl font-semibold pointer-events-none">Movies</div>
+            </div>
+
+            <div id="landing-tv-container" class="relative w-full sm:w-auto cursor-pointer transition-transform duration-200 hover:scale-105">
+                <img src="https://placehold.co/256x384/14b8a6/ffffff?text=TV+Shows"
+                     alt="TV show poster collage placeholder"
+                     class="w-full sm:w-48 lg:w-60 h-64 lg:h-80 object-cover rounded-lg shadow-md brightness-75 hover:brightness-100 transition-all"
+                     onerror="this.onerror=null; this.src='https://placehold.co/256x384/cccccc/666666?text=TV+Error';">
+                 <div class="absolute bottom-4 left-4 right-4 text-center text-white text-xl font-semibold pointer-events-none">TV Shows</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="movie-app" class="hidden">
+        <div class="flex flex-col md:flex-row gap-6 max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+            <div id="movie-filters-container" class="md:w-1/3 lg:w-1/4 order-1 md:order-1 bg-gray-100 p-4 rounded-lg shadow-md max-h-[calc(100vh-150px)] overflow-y-auto scrollable-area">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 text-center">Movie Filters</h2>
+                <form id="movie-recommendation-form" class="space-y-4">
+                     <div>
+                        <label for="movie-genre" class="block text-sm font-medium text-gray-700 mb-1">Genre</label>
+                        <select id="movie-genre" name="genre" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"> <option value="">Any</option> </select>
+                    </div>
+                    <div>
+                        <label for="movie-tmdb-rating" class="block text-sm font-medium text-gray-700 mb-1">Min TMDb Rating (0-10)</label>
+                        <input type="number" id="movie-tmdb-rating" name="tmdb-rating" min="0" max="10" step="0.1" placeholder="e.g., 7.0" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                    </div>
+                    <div>
+                        <label for="movie-year-slider" class="block text-sm font-medium text-gray-700 mb-1">Release Year Range</label>
+                        <div id="movie-year-slider" class="mt-6 mb-1 year-slider"></div>
+                        <div class="slider-values">
+                            <span id="movie-min-year-display">1900</span>
+                            <span id="movie-max-year-display">Year</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="movie-language" class="block text-sm font-medium text-gray-700 mb-1">Original Language</label>
+                        <select id="movie-language" name="language" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"> <option value="">Any</option> </select>
+                    </div>
+                    <div>
+                        <label for="movie-country" class="block text-sm font-medium text-gray-700 mb-1">Country of Origin</label>
+                        <select id="movie-country" name="country" autocomplete="country" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"> <option value="">Any</option> </select>
+                    </div>
+                    <div>
+                        <label for="movie-watch-country" class="block text-sm font-medium text-gray-700 mb-1">Watch Region (Providers)</label>
+                        <select id="movie-watch-country" name="watch-country" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"> </select>
+                    </div>
+                    <div class="pt-2">
+                        <button type="submit" id="movie-find-button" class="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/search.svg" alt="Search" class="w-5 h-5 inline-block -ml-1" style="filter: invert(1);"/>
+                            Find Movies
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="flex-grow md:w-2/3 lg:w-3/4 order-2 md:order-2">
+                 <div id="movie-results-view">
+                     <div id="movie-sort-controls" class="flex justify-between items-center mb-4">
+                         <h2 class="text-xl sm:text-2xl font-semibold text-gray-100">Movie Recommendations</h2>
+                         <div class="flex items-center">
+                             <label for="movie-sort-options" class="text-sm font-medium text-gray-300 mr-2">Sort by:</label>
+                             <select id="movie-sort-options" name="sort-options" class="p-2 border border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-gray-700 text-gray-100">
+                                 <option value="popularity.desc">Popularity</option>
+                                 <option value="vote_average.desc">Rating (High-Low)</option>
+                                 <option value="vote_average.asc">Rating (Low-High)</option>
+                                 <option value="primary_release_date.desc">Release Date Desc</option>
+                                 <option value="primary_release_date.asc">Release Date Asc</option>
+                                 <option value="original_title.asc">Title (A-Z)</option>
+                             </select>
+                         </div>
+                     </div>
+                     <div id="movie-results-container" class="min-h-[400px] max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollable-area">
+                         <div id="movie-results" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                             <p id="movie-results-placeholder" class="text-center text-gray-400 p-4 col-span-full">Select filters and click "Find Movies".</p>
+                         </div>
+                     </div>
+                     <div id="movie-pagination-controls" class="pagination-controls" style="display: none;">
+                        <button id="movie-prev-button" class="btn-movie" disabled>&lt; Previous</button>
+                        <span id="movie-page-info" class="page-info">Page 1 of 1</span>
+                        <button id="movie-next-button" class="btn-movie" disabled>Next &gt;</button>
+                    </div>
+                </div>
+                <div id="movie-details-page" class="hidden bg-white rounded-lg shadow-lg overflow-hidden max-h-[calc(100vh-150px)] overflow-y-auto scrollable-area">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tv-app" class="hidden">
+        <div class="flex flex-col md:flex-row gap-6 max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+            <div id="tv-filters-container" class="md:w-1/3 lg:w-1/4 order-1 md:order-1 bg-gray-100 p-4 rounded-lg shadow-md max-h-[calc(100vh-100px)] overflow-y-auto scrollable-area">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 text-center">TV Show Filters</h2>
+                <form id="tv-recommendation-form" class="space-y-4">
+                     <div>
+                        <label for="tv-genre" class="block text-sm font-medium text-gray-700 mb-1">Genre</label>
+                        <select id="tv-genre" name="genre" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm"> <option value="">Any</option> </select>
+                    </div>
+                    <div>
+                        <label for="tv-tmdb-rating" class="block text-sm font-medium text-gray-700 mb-1">Min TMDb Rating (0-10)</label>
+                        <input type="number" id="tv-tmdb-rating" name="tmdb-rating" min="0" max="10" step="0.1" placeholder="e.g., 7.0" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm">
+                    </div>
+                    <div>
+                        <label for="tv-year-slider" class="block text-sm font-medium text-gray-700 mb-1">First Air Year Range</label>
+                        <div id="tv-year-slider" class="mt-6 mb-1 year-slider"></div>
+                        <div class="slider-values">
+                            <span id="tv-min-year-display">1900</span>
+                            <span id="tv-max-year-display">Year</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="tv-language" class="block text-sm font-medium text-gray-700 mb-1">Original Language</label>
+                        <select id="tv-language" name="language" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm"> <option value="">Any</option> </select>
+                    </div>
+                    <div>
+                        <label for="tv-country" class="block text-sm font-medium text-gray-700 mb-1">Country of Origin</label>
+                        <select id="tv-country" name="country" autocomplete="country" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm"> <option value="">Any</option> </select>
+                    </div>
+                    <div>
+                        <label for="tv-watch-country" class="block text-sm font-medium text-gray-700 mb-1">Watch Region (Providers)</label>
+                        <select id="tv-watch-country" name="watch-country" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm"> </select>
+                    </div>
+                    <div class="pt-2">
+                        <button type="submit" id="tv-find-button" class="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition duration-150 ease-in-out gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/search.svg" alt="Search" class="w-5 h-5 inline-block -ml-1" style="filter: invert(1);"/>
+                            Find TV Shows
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="flex-grow md:w-2/3 lg:w-3/4 order-2 md:order-2">
+                 <div id="tv-results-view">
+                     <div id="tv-sort-controls" class="flex justify-between items-center mb-4">
+                         <h2 class="text-xl sm:text-2xl font-semibold text-gray-100">TV Show Recommendations</h2>
+                         <div class="flex items-center">
+                             <label for="tv-sort-options" class="text-sm font-medium text-gray-300 mr-2">Sort by:</label>
+                             <select id="tv-sort-options" name="sort-options" class="p-2 border border-gray-600 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm bg-gray-700 text-gray-100">
+                                 <option value="popularity.desc">Popularity Desc</option>
+                                 <option value="popularity.asc">Popularity Asc</option>
+                                 <option value="vote_average.desc">Rating Desc</option>
+                                 <option value="vote_average.asc">Rating Asc</option>
+                                 <option value="first_air_date.desc">First Air Date Desc</option>
+                                 <option value="first_air_date.asc">First Air Date Asc</option>
+                             </select>
+                         </div>
+                     </div>
+                     <div id="tv-results-container" class="min-h-[400px] max-h-[calc(100vh-200px)] overflow-y-auto pr-2 scrollable-area">
+                         <div id="tv-results" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                             <p id="tv-results-placeholder" class="text-center text-gray-400 p-4 col-span-full">Select filters and click "Find TV Shows".</p>
+                         </div>
+                     </div>
+                     <div id="tv-pagination-controls" class="pagination-controls" style="display: none;">
+                        <button id="tv-prev-button" class="btn-tv" disabled>&lt; Previous</button>
+                        <span id="tv-page-info" class="page-info">Page 1 of 1</span>
+                        <button id="tv-next-button" class="btn-tv" disabled>Next &gt;</button>
+                    </div>
+                </div>
+                <div id="tv-details-page" class="hidden bg-white rounded-lg shadow-lg overflow-hidden max-h-[calc(100vh-150px)] overflow-y-auto scrollable-area">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="message-box"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+
+    <script>
+        // --- Constants and Global Config ---
+        const apiKey = '1897ffc0a507fadb98e68392bca2efd1'; // WARNING: Insecure
+        const tmdbBaseUrl = 'https://api.themoviedb.org/3';
+        const imageBaseUrl = 'https://image.tmdb.org/t/p/w342';
+        const backdropBaseUrl = 'https://image.tmdb.org/t/p/w780';
+        const castProfileBaseUrl = 'https://image.tmdb.org/t/p/w185';
+        const sliderMinYear = 1900;
+        const sliderMaxYear = new Date().getFullYear();
+
+        // --- Genre Maps ---
+        const movieGenreMap = { "Action": 28, "Adventure": 12, "Animation": 16, "Comedy": 35, "Crime": 80, "Documentary": 99, "Drama": 18, "Family": 10751, "Fantasy": 14, "History": 36, "Horror": 27, "Music": 10402, "Mystery": 9648, "Romance": 10749, "Sci-Fi": 878, "TV Movie": 10770, "Thriller": 53, "War": 10752, "Western": 37 };
+        const tvGenreMap = { "Action & Adventure": 10759, "Animation": 16, "Comedy": 35, "Crime": 80, "Documentary": 99, "Drama": 18, "Family": 10751, "Kids": 10762, "Mystery": 9648, "News": 10763, "Reality": 10764, "Sci-Fi & Fantasy": 10765, "Soap": 10766, "Talk": 10767, "War & Politics": 10768, "Western": 37 };
+        const languageMap = { "English": "en", "Spanish": "es", "French": "fr", "German": "de", "Japanese": "ja", "Korean": "ko", "Hindi": "hi", "Mandarin": "zh", "Italian": "it", "Portuguese": "pt" };
+        const countryMap = { "Australia": "AU", "Brazil": "BR", "Canada": "CA", "China": "CN", "France": "FR", "Germany": "DE", "India": "IN", "Italy": "IT", "Japan": "JP", "Mexico": "MX", "Netherlands": "NL", "South Korea": "KR", "Spain": "ES", "Sweden": "SE", "UK": "GB", "USA": "US" };
+        const watchRegionMap = countryMap;
+
+        // --- DOM Elements ---
+        const landingPage = document.getElementById('landing-page');
+        const movieApp = document.getElementById('movie-app');
+        const tvApp = document.getElementById('tv-app');
+        const messageBox = document.getElementById('message-box');
+        let messageTimeout;
+
+        // Movie App Elements
+        const movieForm = document.getElementById('movie-recommendation-form');
+        const movieResultsView = document.getElementById('movie-results-view');
+        const movieResultsDiv = document.getElementById('movie-results');
+        const movieResultsPlaceholder = document.getElementById('movie-results-placeholder');
+        const movieGenreSelect = document.getElementById('movie-genre');
+        const movieTmdbRatingInput = document.getElementById('movie-tmdb-rating');
+        const movieLanguageSelect = document.getElementById('movie-language');
+        const movieCountrySelect = document.getElementById('movie-country');
+        const movieWatchCountrySelect = document.getElementById('movie-watch-country');
+        const movieFindButton = document.getElementById('movie-find-button');
+        const movieYearSliderElement = document.getElementById('movie-year-slider');
+        const movieMinYearDisplay = document.getElementById('movie-min-year-display');
+        const movieMaxYearDisplay = document.getElementById('movie-max-year-display');
+        const moviePaginationControls = document.getElementById('movie-pagination-controls');
+        const moviePrevButton = document.getElementById('movie-prev-button');
+        const movieNextButton = document.getElementById('movie-next-button');
+        const moviePageInfo = document.getElementById('movie-page-info');
+        const movieSortOptionsSelect = document.getElementById('movie-sort-options');
+        const movieDetailsPage = document.getElementById('movie-details-page');
+
+        // TV App Elements
+        const tvForm = document.getElementById('tv-recommendation-form');
+        const tvResultsView = document.getElementById('tv-results-view');
+        const tvResultsDiv = document.getElementById('tv-results');
+        const tvResultsPlaceholder = document.getElementById('tv-results-placeholder');
+        const tvGenreSelect = document.getElementById('tv-genre');
+        const tvTmdbRatingInput = document.getElementById('tv-tmdb-rating');
+        const tvLanguageSelect = document.getElementById('tv-language');
+        const tvCountrySelect = document.getElementById('tv-country');
+        const tvWatchCountrySelect = document.getElementById('tv-watch-country');
+        const tvFindButton = document.getElementById('tv-find-button');
+        const tvYearSliderElement = document.getElementById('tv-year-slider');
+        const tvMinYearDisplay = document.getElementById('tv-min-year-display');
+        const tvMaxYearDisplay = document.getElementById('tv-max-year-display');
+        const tvPaginationControls = document.getElementById('tv-pagination-controls');
+        const tvPrevButton = document.getElementById('tv-prev-button');
+        const tvNextButton = document.getElementById('tv-next-button');
+        const tvPageInfo = document.getElementById('tv-page-info');
+        const tvSortOptionsSelect = document.getElementById('tv-sort-options');
+        const tvDetailsPage = document.getElementById('tv-details-page');
+
+        // Nav Bar Elements
+        const navHomeButton = document.getElementById('nav-home');
+        const navMoviesButton = document.getElementById('nav-movies');
+        const navTvButton = document.getElementById('nav-tv');
+
+        // Landing Page Clickable Image Containers
+        const landingMovieContainer = document.getElementById('landing-movie-container');
+        const landingTvContainer = document.getElementById('landing-tv-container');
+
+        // --- Global State Variables ---
+        let movieCurrentStartYear = 1990; let movieCurrentEndYear = 2020; let movieCurrentMovieData = []; let movieCurrentWatchCountry = 'US'; let movieCurrentSort = 'popularity.desc'; let movieCurrentPage = 1; let movieTotalPages = 1; let movieTotalResults = 0; let movieCurrentFilters = {}; let movieDataLoaded = false;
+        let tvCurrentStartYear = 1990; let tvCurrentEndYear = 2020; let tvCurrentShowData = []; let tvCurrentWatchCountry = 'US'; let tvCurrentSort = 'popularity.desc'; let tvCurrentPage = 1; let tvTotalPages = 1; let tvTotalResults = 0; let tvCurrentFilters = {}; let tvDataLoaded = false;
+
+
+        // --- Utility Functions ---
+        function populateSelect(selectElement, map, defaultValue = null) { if (!selectElement) return; const firstOption = selectElement.options[0]; selectElement.innerHTML = ''; if (firstOption && firstOption.value === "") { selectElement.appendChild(firstOption); } const sortedEntries = Object.entries(map).sort((a, b) => a[0].localeCompare(b[0])); sortedEntries.forEach(([name, value]) => { const option = document.createElement('option'); option.value = value; option.textContent = name; if (value === defaultValue) { option.selected = true; } selectElement.appendChild(option); }); }
+        function showMessage(message, type = 'error', duration = 4000) { messageBox.textContent = message; messageBox.className = ''; messageBox.classList.add('show', type); if (messageTimeout) clearTimeout(messageTimeout); messageTimeout = setTimeout(() => { messageBox.classList.remove('show'); }, duration); }
+        async function fetchWatchProviders(items, type = 'movie') { const idKey = 'id'; const endpoint = type; const providerPromises = items.map(item => { if (!item || !item[idKey]) { console.warn("Item missing ID for provider fetch:", item); return Promise.resolve(null); } const providerUrl = `${tmdbBaseUrl}/${endpoint}/${item[idKey]}/watch/providers?api_key=${apiKey}`; return fetch(providerUrl).then(response => response.ok ? response.json() : null) .catch(error => { console.error(`Error fetching providers for ${type} ${item[idKey]}:`, error); return null; }); }); const results = await Promise.allSettled(providerPromises); return items.map((item, index) => { if (item) { item.watchProviders = (results[index].status === 'fulfilled' && results[index].value) ? results[index].value.results : null; } return item; }); }
+
+        // --- Movie App Functions ---
+        function movieDisplayResults(movies, watchCountryCode) { movieResultsDiv.innerHTML = ''; const placeholder = document.getElementById('movie-results-placeholder'); if (placeholder) placeholder.style.display = 'none'; if (!movies || movies.length === 0) { movieResultsDiv.innerHTML = '<p class="text-center text-gray-500 p-4 col-span-full">No movies found matching your criteria.</p>'; return; } movies.forEach(movie => { if (!movie) return; const gridItem = document.createElement('div'); gridItem.className = 'movie-grid-item grid-item'; gridItem.dataset.itemId = movie.id; gridItem.dataset.itemType = 'movie'; const posterImg = document.createElement('img'); posterImg.className = 'poster-grid'; posterImg.src = movie.poster_path ? `${imageBaseUrl}${movie.poster_path}` : 'https://placehold.co/342x513/e5e7eb/4b5563?text=N/A'; posterImg.alt = `Poster for ${movie.title || 'movie'}`; posterImg.loading = 'lazy'; posterImg.onerror = function() { this.onerror=null; this.src='https://placehold.co/342x513/e5e7eb/4b5563?text=Error'; }; gridItem.appendChild(posterImg); const infoDiv = document.createElement('div'); infoDiv.className = 'item-info'; const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'; const voteCount = movie.vote_count !== undefined ? movie.vote_count : 0; const year = movie.release_date ? movie.release_date.substring(0, 4) : 'N/A'; const lang = movie.original_language ? movie.original_language.toUpperCase() : 'N/A'; infoDiv.innerHTML = `<p><strong>Rating:</strong> ${rating}/10 (${voteCount.toLocaleString()} votes)</p> <p><strong>Year:</strong> ${year} | <strong>Lang:</strong> ${lang}</p>`; gridItem.appendChild(infoDiv); const tooltip = document.createElement('div'); tooltip.className = 'provider-tooltip'; const providerListDiv = document.createElement('div'); const providers = movie.watchProviders?.[watchCountryCode]?.flatrate; if (providers && providers.length > 0) { providers.slice(0, 3).forEach(p => { const span = document.createElement('span'); span.textContent = p.provider_name; providerListDiv.appendChild(span); }); if (providers.length > 3) providerListDiv.innerHTML += ' ...'; } else if (movie.watchProviders === null) { providerListDiv.innerHTML = `<span class="text-gray-400 italic">Providers N/A</span>`; } else { providerListDiv.innerHTML = `<span class="text-gray-400 italic">No ${watchCountryCode} stream</span>`; } tooltip.appendChild(providerListDiv); gridItem.appendChild(tooltip); gridItem.addEventListener('click', () => { showMovieDetails(movie.id); }); movieResultsDiv.appendChild(gridItem); }); }
+        function movieUpdatePaginationControls() { if (movieTotalResults > 0) { moviePageInfo.textContent = `Page ${movieCurrentPage} of ${movieTotalPages} (${movieTotalResults} results)`; moviePrevButton.disabled = movieCurrentPage <= 1; movieNextButton.disabled = movieCurrentPage >= movieTotalPages; moviePaginationControls.style.display = 'flex'; } else { moviePaginationControls.style.display = 'none'; } }
+        function movieRenderDetails(movieData) { movieDetailsPage.innerHTML = ''; const backdropPath = movieData.backdrop_path ? `${backdropBaseUrl}${movieData.backdrop_path}` : ''; const posterPath = movieData.poster_path ? `${imageBaseUrl}${movieData.poster_path}` : 'https://placehold.co/150x225/e5e7eb/4b5563?text=N/A'; const title = movieData.title || 'Title Not Available'; const tagline = movieData.tagline || ''; const overview = movieData.overview || 'No overview available.'; const releaseYear = movieData.release_date ? movieData.release_date.substring(0, 4) : 'N/A'; const runtime = movieData.runtime ? `${Math.floor(movieData.runtime / 60)}h ${movieData.runtime % 60}m` : 'N/A'; const rating = movieData.vote_average ? movieData.vote_average.toFixed(1) : 'N/A'; const voteCount = movieData.vote_count !== undefined ? movieData.vote_count : 0; const genres = movieData.genres?.map(g => g.name).join(', ') || 'N/A'; const cast = movieData.credits?.cast?.slice(0, 10) || []; const detailsHTML = `<div class="details-backdrop" style="background-image: ${backdropPath ? `url(${backdropPath})` : 'none'}; background-color: #e5e7eb;"></div> <div class="p-4 md:p-6"> <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end"> <button id="movie-back-to-results" class="details-back-button inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 gap-1"> <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/arrow-left.svg" alt="Back" class="w-4 h-4 inline-block" style="filter: invert(1);"/> Back </button> </div> <div class="flex flex-col sm:flex-row gap-4 md:gap-6 items-start mt-[-75px]"> <img src="${posterPath}" alt="Poster for ${title}" class="details-poster flex-shrink-0 mx-auto sm:mx-0" onerror="this.onerror=null; this.src='https://placehold.co/150x225/e5e7eb/4b5563?text=Error';"> <div class="flex-grow pt-4 sm:pt-0 text-gray-800"> <h1 class="text-2xl md:text-3xl font-bold mb-1">${title} <span class="font-normal text-xl md:text-2xl text-gray-500">(${releaseYear})</span></h1> ${tagline ? `<p class="text-sm text-gray-500 italic mb-3">${tagline}</p>` : ''} <div class="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm mb-3 text-gray-600"> <span>${genres}</span> ${movieData.runtime ? `<span>• ${runtime}</span>` : ''} </div> <div class="flex items-center gap-2 mb-4"> <span class="text-lg font-semibold text-yellow-500">★ ${rating}</span> <span class="text-xs text-gray-500">(${voteCount.toLocaleString()} votes)</span> </div> <h3 class="text-lg font-semibold mb-1 text-gray-800">Overview</h3> <p class="text-sm text-gray-700 mb-4">${overview}</p> </div> </div> ${cast.length > 0 ? `<div class="mt-6"><h3 class="text-lg font-semibold mb-3 text-gray-800">Top Billed Cast</h3><div class="details-cast-grid">${cast.map(member => `<div class="cast-card"><img src="${member.profile_path ? `${castProfileBaseUrl}${member.profile_path}` : 'https://placehold.co/185x278/e5e7eb/4b5563?text=N/A'}" alt="${member.name}" class="cast-photo" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/185x278/e5e7eb/4b5563?text=Error';"><p class="cast-name">${member.name || 'N/A'}</p><p class="cast-char">${member.character || 'N/A'}</p></div>`).join('')}</div></div>` : ''} </div>`; movieDetailsPage.innerHTML = detailsHTML; const backButton = movieDetailsPage.querySelector('#movie-back-to-results'); if (backButton) { backButton.addEventListener('click', hideMovieDetails); console.log("Movie Back Button Listener Attached"); } else { console.error("Movie back button not found");} }
+        async function showMovieDetails(movieId) { movieResultsView.classList.add('hidden'); movieDetailsPage.classList.remove('hidden'); movieDetailsPage.innerHTML = '<p class="text-center p-8 text-gray-500">Loading movie details...</p>'; const detailsUrl = `${tmdbBaseUrl}/movie/${movieId}?api_key=${apiKey}&append_to_response=credits`; try { const response = await fetch(detailsUrl); if (!response.ok) { let errorMsg = `Error fetching details: ${response.status}`; try { const data=await response.json(); errorMsg += `: ${data.status_message}`;} catch(e){} throw new Error(errorMsg); } const movieData = await response.json(); movieRenderDetails(movieData); } catch (error) { console.error("Fetch Movie Details Error:", error); showMessage(`Failed to load movie details. ${error.message}`, 'error'); movieDetailsPage.innerHTML = `<p class="text-center p-8 text-red-600">Could not load details.</p><div class="mt-4 p-4 text-center"><button id="movie-back-to-results-error" class="details-back-button inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 gap-1"><img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/arrow-left.svg" alt="Back" class="w-4 h-4 inline-block" style="filter: invert(1);"/> Back</button></div>`; const backButtonError = movieDetailsPage.querySelector('#movie-back-to-results-error'); if(backButtonError) backButtonError.addEventListener('click', hideMovieDetails); } }
+        function hideMovieDetails() { console.log("hideMovieDetails called"); movieDetailsPage.classList.add('hidden'); movieDetailsPage.innerHTML = ''; movieResultsView.classList.remove('hidden'); }
+        async function moviePerformSearchAndDisplay(page = 1) { hideMovieDetails(); movieFindButton.disabled = true; if(moviePrevButton) moviePrevButton.disabled = true; if(movieNextButton) movieNextButton.disabled = true; moviePaginationControls.style.display = 'none'; movieCurrentPage = page; movieResultsDiv.innerHTML = ''; if (movieResultsPlaceholder) movieResultsPlaceholder.style.display = 'block'; movieResultsPlaceholder.textContent = `Loading page ${movieCurrentPage}...`; const discoverUrl = new URL(`${tmdbBaseUrl}/discover/movie`); discoverUrl.searchParams.append('api_key', apiKey); discoverUrl.searchParams.append('page', movieCurrentPage); discoverUrl.searchParams.append('include_adult', 'false'); discoverUrl.searchParams.append('include_video', 'false'); discoverUrl.searchParams.append('language', 'en-US'); discoverUrl.searchParams.append('sort_by', movieCurrentSort); discoverUrl.searchParams.append('vote_count.gte', 100); if (movieCurrentFilters.genreId) discoverUrl.searchParams.append('with_genres', movieCurrentFilters.genreId); if (movieCurrentFilters.rating > 0) discoverUrl.searchParams.append('vote_average.gte', movieCurrentFilters.rating.toFixed(1)); if (movieCurrentFilters.releaseGte) discoverUrl.searchParams.append('primary_release_date.gte', movieCurrentFilters.releaseGte); if (movieCurrentFilters.releaseLte) discoverUrl.searchParams.append('primary_release_date.lte', movieCurrentFilters.releaseLte); if (movieCurrentFilters.langCode) discoverUrl.searchParams.append('with_original_language', movieCurrentFilters.langCode); if (movieCurrentFilters.originCountry) discoverUrl.searchParams.append('with_origin_country', movieCurrentFilters.originCountry); console.log('Fetching Movie URL:', discoverUrl.toString()); try { const response = await fetch(discoverUrl); if (!response.ok) { let errorMsg = `Error fetching movies: ${response.status}`; try { const data=await response.json(); errorMsg += `: ${data.status_message}`;} catch(e){} throw new Error(errorMsg); } const data = await response.json(); let fetchedMovies = data.results; movieTotalPages = data.total_pages; movieTotalResults = data.total_results; if (fetchedMovies.length === 0) { if (movieCurrentPage === 1) { movieDisplayResults([], movieCurrentWatchCountry); } else { showMessage(`No results found on page ${movieCurrentPage}.`, 'info'); movieDisplayResults([], movieCurrentWatchCountry); } movieUpdatePaginationControls(); return; } if (movieResultsPlaceholder) movieResultsPlaceholder.textContent = 'Fetching watch provider information...'; const moviesWithProviders = await fetchWatchProviders(fetchedMovies, 'movie'); movieCurrentMovieData = moviesWithProviders; movieDisplayResults(movieCurrentMovieData, movieCurrentWatchCountry); movieUpdatePaginationControls(); } catch (error) { console.error("API Fetch Error (Movie):", error); showMessage(`Failed to process request. ${error.message}`, 'error'); movieResultsDiv.innerHTML = `<p class="text-center text-red-600 p-4 col-span-full">Error loading recommendations.</p>`; if (movieResultsPlaceholder) movieResultsPlaceholder.style.display = 'none'; moviePaginationControls.style.display = 'none'; } finally { movieFindButton.disabled = false; movieFindButton.innerHTML = `<img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/search.svg" alt="Search" class="w-5 h-5 inline-block -ml-1" style="filter: invert(1);"/> Find Movies`; movieUpdatePaginationControls(); } }
+
+        // --- TV App Functions ---
+        function tvDisplayResults(shows, watchCountryCode) { tvResultsDiv.innerHTML = ''; if (tvResultsPlaceholder) tvResultsPlaceholder.style.display = 'none'; if (!shows || shows.length === 0) { tvResultsDiv.innerHTML = '<p class="text-center text-gray-500 p-4 col-span-full">No TV shows found matching your criteria.</p>'; return; } shows.forEach(show => { if (!show) return; const gridItem = document.createElement('div'); gridItem.className = 'tv-grid-item grid-item'; gridItem.dataset.itemId = show.id; gridItem.dataset.itemType = 'tv'; const posterImg = document.createElement('img'); posterImg.className = 'poster-grid'; posterImg.src = show.poster_path ? `${imageBaseUrl}${show.poster_path}` : 'https://placehold.co/342x513/e5e7eb/4b5563?text=N/A'; posterImg.alt = `Poster for ${show.name || 'TV Show'}`; posterImg.loading = 'lazy'; posterImg.onerror = function() { this.onerror=null; this.src='https://placehold.co/342x513/e5e7eb/4b5563?text=Error'; }; gridItem.appendChild(posterImg); const infoDiv = document.createElement('div'); infoDiv.className = 'item-info'; const rating = show.vote_average ? show.vote_average.toFixed(1) : 'N/A'; const voteCount = show.vote_count !== undefined ? show.vote_count : 0; const year = show.first_air_date ? show.first_air_date.substring(0, 4) : 'N/A'; const lang = show.original_language ? show.original_language.toUpperCase() : 'N/A'; infoDiv.innerHTML = `<p><strong>Rating:</strong> ${rating}/10 (${voteCount.toLocaleString()} votes)</p> <p><strong>Year:</strong> ${year} | <strong>Lang:</strong> ${lang}</p>`; gridItem.appendChild(infoDiv); const tooltip = document.createElement('div'); tooltip.className = 'provider-tooltip'; const providerListDiv = document.createElement('div'); const providers = show.watchProviders?.[watchCountryCode]?.flatrate; if (providers && providers.length > 0) { providers.slice(0, 3).forEach(p => { const span = document.createElement('span'); span.textContent = p.provider_name; providerListDiv.appendChild(span); }); if (providers.length > 3) providerListDiv.innerHTML += ' ...'; } else if (show.watchProviders === null) { providerListDiv.innerHTML = `<span class="text-gray-400 italic">Providers N/A</span>`; } else { providerListDiv.innerHTML = `<span class="text-gray-400 italic">No ${watchCountryCode} stream</span>`; } tooltip.appendChild(providerListDiv); gridItem.appendChild(tooltip); gridItem.addEventListener('click', () => { showTvDetails(show.id); }); tvResultsDiv.appendChild(gridItem); }); }
+        function tvUpdatePaginationControls() { if (tvTotalResults > 0) { tvPageInfo.textContent = `Page ${tvCurrentPage} of ${tvTotalPages} (${tvTotalResults} results)`; tvPrevButton.disabled = tvCurrentPage <= 1; tvNextButton.disabled = tvCurrentPage >= tvTotalPages; tvPaginationControls.style.display = 'flex'; } else { tvPaginationControls.style.display = 'none'; } }
+        function tvRenderDetails(showData) { tvDetailsPage.innerHTML = ''; const backdropPath = showData.backdrop_path ? `${backdropBaseUrl}${showData.backdrop_path}` : ''; const posterPath = showData.poster_path ? `${imageBaseUrl}${showData.poster_path}` : 'https://placehold.co/150x225/e5e7eb/4b5563?text=N/A'; const title = showData.name || 'Title Not Available'; const tagline = showData.tagline || ''; const overview = showData.overview || 'No overview available.'; const firstAirYear = showData.first_air_date ? showData.first_air_date.substring(0, 4) : 'N/A'; let runtime = 'N/A'; if (showData.episode_run_time && showData.episode_run_time.length > 0 && showData.episode_run_time[0] > 0) { runtime = `${showData.episode_run_time[0]} min/ep`; } else if (showData.last_episode_to_air?.runtime) { runtime = `${showData.last_episode_to_air.runtime} min/ep`; } const rating = showData.vote_average ? showData.vote_average.toFixed(1) : 'N/A'; const voteCount = showData.vote_count !== undefined ? showData.vote_count : 0; const genres = showData.genres?.map(g => g.name).join(', ') || 'N/A'; const cast = showData.credits?.cast?.slice(0, 10) || []; const seasons = showData.number_of_seasons; const episodes = showData.number_of_episodes; const detailsHTML = `<div class="details-backdrop" style="background-image: ${backdropPath ? `url(${backdropPath})` : 'none'}; background-color: #e5e7eb;"></div> <div class="p-4 md:p-6"> <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end"> <button id="tv-back-to-results" class="details-back-button inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 gap-1"> <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/arrow-left.svg" alt="Back" class="w-4 h-4 inline-block" style="filter: invert(1);"/> Back </button> </div> <div class="flex flex-col sm:flex-row gap-4 md:gap-6 items-start mt-[-75px]"> <img src="${posterPath}" alt="Poster for ${title}" class="details-poster flex-shrink-0 mx-auto sm:mx-0" onerror="this.onerror=null; this.src='https://placehold.co/150x225/e5e7eb/4b5563?text=Error';"> <div class="flex-grow pt-4 sm:pt-0 text-gray-800"> <h1 class="text-2xl md:text-3xl font-bold mb-1">${title} <span class="font-normal text-xl md:text-2xl text-gray-500">(${firstAirYear})</span></h1> ${tagline ? `<p class="text-sm text-gray-500 italic mb-3">${tagline}</p>` : ''} <div class="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm mb-3 text-gray-600"> <span>${genres}</span> ${runtime !== 'N/A' ? `<span>• ${runtime}</span>` : ''} ${seasons ? `<span>• ${seasons} Season${seasons > 1 ? 's' : ''}</span>` : ''} ${episodes ? `<span>• ${episodes} Episodes</span>` : ''} </div> <div class="flex items-center gap-2 mb-4"> <span class="text-lg font-semibold text-yellow-500">★ ${rating}</span> <span class="text-xs text-gray-500">(${voteCount.toLocaleString()} votes)</span> </div> <h3 class="text-lg font-semibold mb-1 text-gray-800">Overview</h3> <p class="text-sm text-gray-700 mb-4">${overview}</p> </div> </div> ${cast.length > 0 ? `<div class="mt-6"><h3 class="text-lg font-semibold mb-3 text-gray-800">Top Billed Cast</h3><div class="details-cast-grid">${cast.map(member => `<div class="cast-card"><img src="${member.profile_path ? `${castProfileBaseUrl}${member.profile_path}` : 'https://placehold.co/185x278/e5e7eb/4b5563?text=N/A'}" alt="${member.name}" class="cast-photo" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/185x278/e5e7eb/4b5563?text=Error';"><p class="cast-name">${member.name || 'N/A'}</p><p class="cast-char">${member.character || 'N/A'}</p></div>`).join('')}</div></div>` : ''} </div>`; tvDetailsPage.innerHTML = detailsHTML; const backButton = tvDetailsPage.querySelector('#tv-back-to-results'); if (backButton) { backButton.addEventListener('click', hideTvDetails); console.log("TV Back Button Listener Attached"); } else { console.error("TV back button not found");} }
+        async function showTvDetails(tvId) { tvResultsView.classList.add('hidden'); tvDetailsPage.classList.remove('hidden'); tvDetailsPage.innerHTML = '<p class="text-center p-8 text-gray-500">Loading TV show details...</p>'; const detailsUrl = `${tmdbBaseUrl}/tv/${tvId}?api_key=${apiKey}&append_to_response=credits`; try { const response = await fetch(detailsUrl); if (!response.ok) { let errorMsg = `Error fetching TV details: ${response.status}`; try { const data=await response.json(); errorMsg += `: ${data.status_message}`;} catch(e){} throw new Error(errorMsg); } const showData = await response.json(); tvRenderDetails(showData); } catch (error) { console.error("Fetch TV Details Error:", error); showMessage(`Failed to load TV details. ${error.message}`, 'error'); tvDetailsPage.innerHTML = `<p class="text-center p-8 text-red-600">Could not load details.</p><div class="mt-4 p-4 text-center"><button id="tv-back-to-results-error" class="details-back-button inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 gap-1"><img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/arrow-left.svg" alt="Back" class="w-4 h-4 inline-block" style="filter: invert(1);"/> Back</button></div>`; const backButtonError = tvDetailsPage.querySelector('#tv-back-to-results-error'); if(backButtonError) backButtonError.addEventListener('click', hideTvDetails); } }
+        function hideTvDetails() { console.log("hideTvDetails called"); tvDetailsPage.classList.add('hidden'); tvDetailsPage.innerHTML = ''; tvResultsView.classList.remove('hidden'); }
+        async function tvPerformSearchAndDisplay(page = 1) { hideTvDetails(); tvFindButton.disabled = true; if(tvPrevButton) tvPrevButton.disabled = true; if(tvNextButton) tvNextButton.disabled = true; tvPaginationControls.style.display = 'none'; tvCurrentPage = page; tvResultsDiv.innerHTML = ''; if (tvResultsPlaceholder) tvResultsPlaceholder.style.display = 'block'; tvResultsPlaceholder.textContent = `Loading page ${tvCurrentPage}...`; const discoverUrl = new URL(`${tmdbBaseUrl}/discover/tv`); discoverUrl.searchParams.append('api_key', apiKey); discoverUrl.searchParams.append('page', tvCurrentPage); discoverUrl.searchParams.append('include_adult', 'false'); discoverUrl.searchParams.append('language', 'en-US'); discoverUrl.searchParams.append('sort_by', tvCurrentSort); discoverUrl.searchParams.append('vote_count.gte', 100); if (tvCurrentFilters.genreId) discoverUrl.searchParams.append('with_genres', tvCurrentFilters.genreId); if (tvCurrentFilters.rating > 0) discoverUrl.searchParams.append('vote_average.gte', tvCurrentFilters.rating.toFixed(1)); if (tvCurrentFilters.releaseGte) discoverUrl.searchParams.append('first_air_date.gte', tvCurrentFilters.releaseGte); if (tvCurrentFilters.releaseLte) discoverUrl.searchParams.append('first_air_date.lte', tvCurrentFilters.releaseLte); if (tvCurrentFilters.langCode) discoverUrl.searchParams.append('with_original_language', tvCurrentFilters.langCode); console.log('Fetching TV URL:', discoverUrl.toString()); try { const response = await fetch(discoverUrl); if (!response.ok) { let errorMsg = `Error fetching TV: ${response.status}`; try { const data=await response.json(); errorMsg += `: ${data.status_message}`;} catch(e){} throw new Error(errorMsg); } const data = await response.json(); let fetchedShows = data.results; tvTotalPages = data.total_pages; tvTotalResults = data.total_results; if (fetchedShows.length === 0) { if (tvCurrentPage === 1) { tvDisplayResults([], tvCurrentWatchCountry); } else { showMessage(`No results found on page ${tvCurrentPage}.`, 'info'); tvDisplayResults([], tvCurrentWatchCountry); } tvUpdatePaginationControls(); return; } if (tvResultsPlaceholder) tvResultsPlaceholder.textContent = 'Fetching watch provider information...'; const showsWithProviders = await fetchWatchProviders(fetchedShows, 'tv'); tvCurrentShowData = showsWithProviders; tvDisplayResults(tvCurrentShowData, tvCurrentWatchCountry); tvUpdatePaginationControls(); } catch (error) { console.error("API Fetch Error (TV):", error); showMessage(`Failed to process request. ${error.message}`, 'error'); tvResultsDiv.innerHTML = `<p class="text-center text-red-600 p-4 col-span-full">Error loading recommendations.</p>`; if (tvResultsPlaceholder) tvResultsPlaceholder.style.display = 'none'; tvPaginationControls.style.display = 'none'; } finally { tvFindButton.disabled = false; tvFindButton.innerHTML = `<img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/search.svg" alt="Search" class="w-5 h-5 inline-block -ml-1" style="filter: invert(1);"/> Find TV Shows`; tvUpdatePaginationControls(); } }
+
+
+        // --- Navigation Logic ---
+        function updateNavActiveState(activePage) { const buttons = [navHomeButton, navMoviesButton, navTvButton]; buttons.forEach(btn => { btn?.classList.remove('active-nav-link', 'bg-gray-700', 'bg-indigo-700', 'bg-teal-700'); }); if (activePage === 'home' && navHomeButton) navHomeButton.classList.add('active-nav-link', 'bg-gray-700'); if (activePage === 'movie' && navMoviesButton) navMoviesButton.classList.add('active-nav-link', 'bg-indigo-700'); if (activePage === 'tv' && navTvButton) navTvButton.classList.add('active-nav-link', 'bg-teal-700'); }
+        function showLandingPage() { landingPage.classList.remove('hidden'); movieApp.classList.add('hidden'); tvApp.classList.add('hidden'); updateNavActiveState('home'); }
+        function showMovieApp() { landingPage.classList.add('hidden'); movieApp.classList.remove('hidden'); tvApp.classList.add('hidden'); updateNavActiveState('movie'); if (!movieDataLoaded) { console.log("Triggering initial movie load."); moviePerformSearchAndDisplay(1); movieDataLoaded = true; } }
+        function showTvApp() { landingPage.classList.add('hidden'); movieApp.classList.add('hidden'); tvApp.classList.remove('hidden'); updateNavActiveState('tv'); if (!tvDataLoaded) { console.log("Triggering initial TV load."); tvPerformSearchAndDisplay(1); tvDataLoaded = true; } }
+
+        // --- Event Listeners ---
+        landingMovieContainer?.addEventListener('click', showMovieApp);
+        landingTvContainer?.addEventListener('click', showTvApp);
+        navHomeButton?.addEventListener('click', showLandingPage);
+        navMoviesButton?.addEventListener('click', showMovieApp);
+        navTvButton?.addEventListener('click', showTvApp);
+
+        movieForm?.addEventListener('submit', (event) => { event.preventDefault(); try { const sliderValues = movieYearSliderElement.noUiSlider.get(true); movieCurrentFilters = { genreId: movieGenreSelect.value, rating: parseFloat(movieTmdbRatingInput.value) || 0, langCode: movieLanguageSelect.value, originCountry: movieCountrySelect.value, releaseGte: `${parseInt(sliderValues[0], 10)}-01-01`, releaseLte: `${parseInt(sliderValues[1], 10)}-12-31` }; movieCurrentWatchCountry = movieWatchCountrySelect.value; movieCurrentSort = movieSortOptionsSelect.value; console.log('Movie Filters Updated (in submit):', movieCurrentFilters); moviePerformSearchAndDisplay(1); } catch (e) { console.error("Error reading movie filters:", e); showMessage("Error reading filters.", "error"); } });
+        moviePrevButton?.addEventListener('click', () => { if (movieCurrentPage > 1) { moviePerformSearchAndDisplay(movieCurrentPage - 1); } });
+        movieNextButton?.addEventListener('click', () => { if (movieCurrentPage < movieTotalPages) { moviePerformSearchAndDisplay(movieCurrentPage + 1); } });
+        movieSortOptionsSelect?.addEventListener('change', (event) => { movieCurrentSort = event.target.value; if (movieCurrentMovieData.length > 0 || movieDataLoaded) { moviePerformSearchAndDisplay(1); } });
+
+         tvForm?.addEventListener('submit', (event) => { event.preventDefault(); try { const sliderValues = tvYearSliderElement.noUiSlider.get(true); tvCurrentFilters = { genreId: tvGenreSelect.value, rating: parseFloat(tvTmdbRatingInput.value) || 0, langCode: tvLanguageSelect.value, originCountry: tvCountrySelect.value, releaseGte: `${parseInt(sliderValues[0], 10)}-01-01`, releaseLte: `${parseInt(sliderValues[1], 10)}-12-31` }; tvCurrentWatchCountry = tvWatchCountrySelect.value; tvCurrentSort = tvSortOptionsSelect.value; console.log('TV Filters Updated (in submit):', tvCurrentFilters); tvPerformSearchAndDisplay(1); } catch (e) { console.error("Error reading TV filters:", e); showMessage("Error reading filters.", "error"); } });
+        tvPrevButton?.addEventListener('click', () => { if (tvCurrentPage > 1) { tvPerformSearchAndDisplay(tvCurrentPage - 1); } });
+        tvNextButton?.addEventListener('click', () => { if (tvCurrentPage < tvTotalPages) { tvPerformSearchAndDisplay(tvCurrentPage + 1); } });
+        tvSortOptionsSelect?.addEventListener('change', (event) => { tvCurrentSort = event.target.value; if (tvCurrentShowData.length > 0 || tvDataLoaded) { tvPerformSearchAndDisplay(1); } });
+
+
+        // --- Initial Setup on DOM Load ---
+        document.addEventListener('DOMContentLoaded', function() {
+            if (movieYearSliderElement) { noUiSlider.create(movieYearSliderElement, { range: { 'min': sliderMinYear, 'max': sliderMaxYear }, start: [movieCurrentStartYear, movieCurrentEndYear], connect: true, step: 1, margin: 1, format: { to: v => Math.round(v), from: v => Number(v) }, tooltips: [true, true] }); movieYearSliderElement.noUiSlider.on('update', (values) => { movieCurrentStartYear = parseInt(values[0]); movieCurrentEndYear = parseInt(values[1]); }); if (movieMinYearDisplay) movieMinYearDisplay.textContent = sliderMinYear; if (movieMaxYearDisplay) movieMaxYearDisplay.textContent = sliderMaxYear; } else { console.error("Movie year slider element not found."); }
+            if (tvYearSliderElement) { noUiSlider.create(tvYearSliderElement, { range: { 'min': sliderMinYear, 'max': sliderMaxYear }, start: [tvCurrentStartYear, tvCurrentEndYear], connect: true, step: 1, margin: 1, format: { to: v => Math.round(v), from: v => Number(v) }, tooltips: [true, true] }); tvYearSliderElement.noUiSlider.on('update', (values) => { tvCurrentStartYear = parseInt(values[0]); tvCurrentEndYear = parseInt(values[1]); }); if (tvMinYearDisplay) tvMinYearDisplay.textContent = sliderMinYear; if (tvMaxYearDisplay) tvMaxYearDisplay.textContent = sliderMaxYear; } else { console.error("TV year slider element not found."); }
+
+             populateSelect(movieGenreSelect, movieGenreMap); populateSelect(movieLanguageSelect, languageMap); populateSelect(movieCountrySelect, countryMap); populateSelect(movieWatchCountrySelect, watchRegionMap, 'US');
+             populateSelect(tvGenreSelect, tvGenreMap); populateSelect(tvLanguageSelect, languageMap); populateSelect(tvCountrySelect, countryMap); populateSelect(tvWatchCountrySelect, watchRegionMap, 'US');
+
+             if(movieResultsDiv && movieResultsPlaceholder) { movieResultsDiv.innerHTML = ''; movieResultsPlaceholder.style.display = 'block'; movieResultsPlaceholder.textContent = 'Select filters and click "Find Movies".'; }
+             if(tvResultsDiv && tvResultsPlaceholder) { tvResultsDiv.innerHTML = ''; tvResultsPlaceholder.style.display = 'block'; tvResultsPlaceholder.textContent = 'Select filters and click "Find TV Shows".'; }
+
+             showLandingPage();
+        });
+
+    </script>
+
+</body>
+</html>
